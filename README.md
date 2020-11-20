@@ -16,6 +16,7 @@
       - [Update npm](#update-npm)
   - [Develop](#develop)
     - [Build and Run](#build-and-run)
+    - [Updating Cargo.toml](#updating-cargotoml)
   - [Reference](#reference)
     - [Rust wasm-bindgen](#rust-wasm-bindgen)
 
@@ -82,11 +83,16 @@ The previous install command probably didn't install the latest npm.
 ### Build and Run
 
 ```zsh
+cargo build
 wasm-pack build
 cd www
 npm install
 npm run start
 ```
+
+### Updating Cargo.toml
+
+If you make any changes to Cargo.toml, run `cargo build`.
 
 ## Reference
 
