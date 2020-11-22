@@ -1,0 +1,9 @@
+{
+  "glsllint.glslangValidatorPath": "/home/zageron/glslang/bin/glslangValidator",
+  "glsllint.additionalStageAssociations": {
+    ".fs": "frag",
+    ".vs": "vert"
+  },
+  "glsl-canvas.useFormatter": true,
+  "glsl-canvas.useCompactFormatter": false
+}
