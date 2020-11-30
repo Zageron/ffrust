@@ -180,12 +180,65 @@
 <li>No GUI or TUI will be implemented.</li>
 <li>No game engine will be used.</li>
 </ul>
-<h3><a class="header" href="#development-constraints" id="development-constraints">Development Constraints</a></h3>
-<ul>
-<li>ImGUI will be used to trigger state changes in the game.</li>
-</ul>
 <h3><a class="header" href="#design-constraints" id="design-constraints">Design Constraints</a></h3>
+<ul>
+<li>User input will be restricted to the spacebar.</li>
+<li>There is no audio or music.</li>
+<li>&quot;Charts&quot; are a simple ASCII file with no metadata.
+<ul>
+<li>&quot;Notes&quot; are represented as a list of ms timings.</li>
+</ul>
+</li>
+<li>Single lane gameplay.
+(Simplified <a href="https://en.wikipedia.org/wiki/Taiko_no_Tatsujin">Taiko No Tatsujin</a>.)
+<ul>
+<li>Notes spawn at the end of the lane, on screen.</li>
+<li>Notes move at linear pace up the lane.</li>
+<li>Notes despawn at the top of the lane.</li>
+<li>Notes may despawn when interacted with during the &quot;receptor&quot; stage.</li>
+</ul>
+</li>
+<li>Score is tallied in two buckets
+<ul>
+<li>Hit</li>
+<li>Miss</li>
+</ul>
+</li>
+<li>No state, the game begins immediately on loading application.
+<ul>
+<li>Likewise, the chart does not repeat once finished.</li>
+</ul>
+</li>
+</ul>
 <h3><a class="header" href="#implementation-constraints" id="implementation-constraints">Implementation Constraints</a></h3>
+<ul>
+<li>Notes are rendered though a simple shape shader.
+<ul>
+<li>No texture loading.</li>
+</ul>
+</li>
+<li>Note position/existence is determined by an absolute ms tick.</li>
+<li>Notes follow a single path along a &quot;lane&quot;.
+<ul>
+<li>Notes are not free to be positioned, but instead have a progress on a lane.</li>
+</ul>
+</li>
+<li>Lane representation which notes may move along.</li>
+</ul>
+<h3><a class="header" href="#completion-requirements" id="completion-requirements">Completion Requirements</a></h3>
+<ul>
+<li>Shader for representing the notes.</li>
+<li>Lane implementation.
+<ul>
+<li>Note lifetime (spawning and despawning)</li>
+</ul>
+</li>
+<li>Note implementation.</li>
+<li>&quot;Chart&quot; interpreter.</li>
+<li>Chart format and exmaple file.</li>
+<li>Keyboard event for spacebar.</li>
+<li>Hit timing mechanism for determining whether a note was hit or not.</li>
+</ul>
 <hr />
 
                     </main>
