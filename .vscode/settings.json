@@ -1,9 +1,11 @@
 {
-  "glsllint.glslangValidatorPath": "/home/zageron/glslang/bin/glslangValidator",
-  "glsllint.additionalStageAssociations": {
-    ".fs": "frag",
-    ".vs": "vert"
-  },
-  "glsl-canvas.useFormatter": true,
-  "glsl-canvas.useCompactFormatter": false
+  "editor.formatOnSave": true,
+  "rust.rustfmt_path": "~/.cargo/bin/rustfmt",
+  "rust-client.engine": "rust-analyzer",
+  "shaderc-lint.additionalFileExtensions": [
+      ".vert",
+      ".frag"
+  ],
+  "shaderc-lint.glslcPath": "L:\\Portable Programs\\path_programs\\shaderc\\bin\\glslc.exe",
+  "shaderc-lint.buildOnSave": true,
 }
