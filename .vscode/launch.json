@@ -7,17 +7,35 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'ffrust'",
+            "name": "Debug executable 'ffrust'",
             "cargo": {
                 "args": [
-                    "test",
-                    "--no-run",
-                    "--lib",
+                    "build",
+                    "--bin=ffrust",
                     "--package=ffrust"
                 ],
                 "filter": {
                     "name": "ffrust",
-                    "kind": "lib"
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'ffrust'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=ffrust",
+                    "--package=ffrust"
+                ],
+                "filter": {
+                    "name": "ffrust",
+                    "kind": "bin"
                 }
             },
             "args": [],
