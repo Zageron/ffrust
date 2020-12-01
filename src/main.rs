@@ -4,15 +4,30 @@ use winit::{
     window::Window,
 };
 
+mod note;
+mod renderer;
+
+use renderer::Renderer;
+
 use futures::executor::block_on;
 
-async fn run(event_loop: EventLoop<()>, _window: Window, _swapchain_format: wgpu::TextureFormat) {
+async fn run() {
     println!("Started running.");
+
+    let event_loop = EventLoop::new();
+
+    let window = Window::new(&event_loop).unwrap();
+    let mut renderer: Renderer = Renderer::new(&window).await;
 
     event_loop.run(
         move |event: Event<()>, _, controlflow: &mut ControlFlow| match event {
             Event::WindowEvent { ref event, .. } => match event {
                 WindowEvent::CloseRequested => *controlflow = ControlFlow::Exit,
+
+                WindowEvent::Resized(size) => {
+                    renderer.resize(*size);
+                }
+
                 WindowEvent::KeyboardInput { input, .. } => match input {
                     KeyboardInput {
                         virtual_keycode: Some(VirtualKeyCode::Space),
@@ -23,16 +38,36 @@ async fn run(event_loop: EventLoop<()>, _window: Window, _swapchain_format: wgpu
                 },
                 _ => {}
             },
+
+            Event::RedrawRequested(_) => {
+                renderer.render();
+                renderer.update();
+            }
+
+            Event::RedrawEventsCleared => {
+                window.request_redraw();
+            }
             _ => {}
         },
     );
 }
 
-fn main() {
-    let event_loop = EventLoop::new();
-    let window = winit::window::Window::new(&event_loop).unwrap();
-    #[cfg(not(target_arch = "wasm32"))]
+fn select_wasm_or_native() {
+    #[cfg(feature = "native")]
     {
-        block_on(run(event_loop, window, wgpu::TextureFormat::Bgra8UnormSrgb));
+        env_logger::init();
+
+        block_on(run());
     }
+    #[cfg(feature = "wasm")]
+    {
+        console_error_panic_hook::set_once();
+        console_log::init_with_level(log::Level::Trace).unwrap();
+
+        futures::executor::block_on(run());
+    }
+}
+
+fn main() {
+    select_wasm_or_native();
 }

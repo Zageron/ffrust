@@ -3,8 +3,8 @@ use bytemuck::{Pod, Zeroable};
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
-    position: [f32; 3],
-    color: [f32; 3],
+    pub position: [f32; 3],
+    pub color: [f32; 3],
 }
 
 impl Vertex {
@@ -32,31 +32,23 @@ unsafe impl Pod for Vertex {}
 unsafe impl Zeroable for Vertex {}
 
 pub struct Note {
-    pub vertices: Vec<Vertex>,
-    pub indices: Vec<u16>,
+    pub x: i32,
+    pub y: i32,
+    pub h: i32,
+    pub w: i32,
 }
 
 impl Note {
-    pub fn new() -> Self {
-        let mut vertices = Vec::new();
+    pub fn new(x: i32, y: i32, h: i32, w: i32) -> Self {
+        Self { x, y, h, w }
+    }
 
-        for i in 0..32 {
-            let angle: f32 = ((i as f32) / 10.0 * 360.0).to_radians();
-            let x: f32 = angle.cos();
-            let y: f32 = angle.sin();
-            vertices.push(Vertex {
-                position: [x, y, 0.0],
-                color: [0.1, 0.4, 0.5],
-            });
-        }
-        vertices.push(vertices[0]);
-
-        let mut indices: Vec<u16> = Vec::new();
-
-        for i in 0..vertices.len() {
-            indices.push(i as u16);
-        }
-
-        Self { vertices, indices }
+    pub fn uv_coord(self) -> (f32, f32, f32, f32) {
+        (
+            self.x as f32 / self.w as f32,
+            self.y as f32 / self.h as f32,
+            self.w as f32 / self.w as f32,
+            self.h as f32 / self.h as f32,
+        )
     }
 }
