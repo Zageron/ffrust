@@ -8,30 +8,118 @@ repository = "https://github.com/Zageron/ffrust"
 license = "AGPL-3.0-only"
 
 [dependencies]
-bytemuck = "1.4.1"
-console_error_panic_hook = { version = "0.1.6", optional = true }
+bytemuck = { version = "1.4", features = ["derive"] }
 console_log = "0.2.0"
 env_logger = "0.8.1"
 euclid = "0.22.1"
 futures = "0.3.7"
-log = "0.4.11"
-rand = { version = "0.7.3", features = ["wasm-bindgen"] }
+log = "0.4"
+rand = { version = "0.7.2", features = ["wasm-bindgen"] }
 specs = { version = "0.16.1", default-features = false, features = ["specs-derive"] }
-wasm-bindgen-futures = { version = "0.4.18", optional = true }
-web-sys = { version = "=0.3.40", optional = true }
 wgpu = "0.6"
-winit = { version = "0.23.0", features = ["web-sys", "serde"] }
+winit = { version = "0.23.0", features = ["web-sys"] }
 
 [profile.dev.package."*"]
 opt-level = 2
 
-[features]
-default = ["native"]
-wasm = [
-    "console_error_panic_hook",
-    "web-sys",
-    "wasm-bindgen-futures",
-    "rand/wasm-bindgen",
-    "specs/wasm-bindgen",
-]
-native = ["specs/parallel"]
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.69" # remember to change version in readme as well
+web-sys = { version = "=0.3.46", features = [
+    "Document",
+    "Navigator",
+    "Node",
+    "NodeList",
+    "Gpu",
+    "GpuAdapter",
+    "GpuAddressMode",
+    "GpuBindGroup",
+    "GpuBindGroupEntry",
+    "GpuBindGroupDescriptor",
+    "GpuBindGroupLayout",
+    "GpuBindGroupLayoutEntry",
+    "GpuBindGroupLayoutDescriptor",
+    "GpuBlendDescriptor",
+    "GpuBlendFactor",
+    "GpuBlendOperation",
+    "GpuBindingType",
+    "GpuBuffer",
+    "GpuBufferBinding",
+    "GpuBufferCopyView",
+    "GpuBufferDescriptor",
+    "GpuCanvasContext",
+    "GpuColorDict",
+    "GpuColorStateDescriptor",
+    "GpuCommandBuffer",
+    "GpuCommandBufferDescriptor",
+    "GpuCommandEncoder",
+    "GpuCommandEncoderDescriptor",
+    "GpuCompareFunction",
+    "GpuComputePassDescriptor",
+    "GpuComputePassEncoder",
+    "GpuComputePipeline",
+    "GpuComputePipelineDescriptor",
+    "GpuCullMode",
+    "GpuDepthStencilStateDescriptor",
+    "GpuDevice",
+    "GpuDeviceDescriptor",
+    "GpuExtent3dDict",
+    "GpuFilterMode",
+    "GpuFrontFace",
+    "GpuIndexFormat",
+    "GpuInputStepMode",
+    "GpuLimits",
+    "GpuLoadOp",
+    "GpuMapMode",
+    "GpuOrigin3dDict",
+    "GpuPipelineLayout",
+    "GpuPipelineLayoutDescriptor",
+    "GpuPowerPreference",
+    "GpuPrimitiveTopology",
+    "GpuProgrammableStageDescriptor",
+    "GpuQueue",
+    "GpuRasterizationStateDescriptor",
+    "GpuRenderBundle",
+    "GpuRenderBundleDescriptor",
+    "GpuRenderBundleEncoder",
+    "GpuRenderBundleEncoderDescriptor",
+    "GpuRenderPassColorAttachmentDescriptor",
+    "GpuRenderPassDepthStencilAttachmentDescriptor",
+    "GpuRenderPassDescriptor",
+    "GpuRenderPassEncoder",
+    "GpuRenderPipeline",
+    "GpuRenderPipelineDescriptor",
+    "GpuRequestAdapterOptions",
+    "GpuSampler",
+    "GpuSamplerDescriptor",
+    "GpuShaderModule",
+    "GpuShaderModuleDescriptor",
+    "GpuStencilOperation",
+    "GpuStencilStateFaceDescriptor",
+    "GpuStoreOp",
+    "GpuSwapChain",
+    "GpuSwapChainDescriptor",
+    "GpuTexture",
+    "GpuTextureAspect",
+    "GpuTextureComponentType",
+    "GpuTextureCopyView",
+    "GpuTextureDataLayout",
+    "GpuTextureDescriptor",
+    "GpuTextureDimension",
+    "GpuTextureFormat",
+    "GpuTextureViewDescriptor",
+    "GpuTextureViewDimension",
+    "GpuTextureView",
+    "GpuVertexAttributeDescriptor",
+    "GpuVertexBufferLayoutDescriptor",
+    "GpuVertexFormat",
+    "GpuVertexStateDescriptor",
+    "GpuVertexAttributeDescriptor",
+    "HtmlCanvasElement",
+    "Window",
+] } 
+js-sys = "0.3.46" 
+wasm-bindgen-futures = "0.4.19" 
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+console_error_panic_hook = "0.1.6"
+console_log = "0.1.2"

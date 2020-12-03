@@ -53,13 +53,13 @@ async fn run() {
 }
 
 fn select_wasm_or_native() {
-    #[cfg(feature = "native")]
+    #[cfg(not(target_arch = "wasm32"))]
     {
         env_logger::init();
 
         block_on(run());
     }
-    #[cfg(feature = "wasm")]
+    #[cfg(target_arch = "wasm32")]
     {
         console_error_panic_hook::set_once();
         console_log::init_with_level(log::Level::Trace).unwrap();
