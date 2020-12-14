@@ -1,11 +1,14 @@
 use std::{
-    convert::TryInto,
     fs::File,
     io::{BufReader, Read},
-    time::Duration,
 };
 
 use bevy::prelude::*;
+
+#[derive(Default)]
+struct NoteskinAtlas {
+    texture_atlas_handle: Handle<TextureAtlas>,
+}
 
 #[derive(Debug)]
 struct Chart {
@@ -15,7 +18,7 @@ struct Chart {
 
 #[derive(Debug, Default, PartialEq, Clone, Copy)]
 pub struct Note {
-    spawned_at: u32,
+    pub spawned_at: u128,
 }
 
 #[derive(Default, Clone, Copy, PartialEq)]
@@ -26,7 +29,8 @@ pub struct Lane {
 
 fn main() {
     let mut app = App::build();
-    app.add_resource(Msaa { samples: 4 })
+    app.init_resource::<NoteskinAtlas>()
+        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_resource(WindowDescriptor {
             title: "FFR Rust Edition".to_string(),
             width: 800,
@@ -50,7 +54,37 @@ fn main() {
         .add_system(animate_sprite_system)
         .add_system(spawn_notes_when_time)
         .add_system(animate_the_notes)
+        .add_system(process_note_lifetime)
+        .add_system(keyboard_input_update)
+        .add_resource(Timer::from_seconds(2.0, false))
         .run();
+}
+
+fn keyboard_input_update(
+    keyboard_input: Res<Input<KeyCode>>,
+    query: Query<(Entity, &Note)>,
+    time: Res<Time>,
+) {
+    let current_time = time.time_since_startup().as_millis();
+
+    for (_entity, note) in query.iter() {
+        // Probably need the lane? Lane info based on how long it's going to take the note to get to the top of the lane.
+        // Lane logic needs to be not ass.
+        let target_lesser = note.spawned_at + 1250;
+        let target_greater = note.spawned_at - 1250;
+        let pressed = keyboard_input.just_pressed(KeyCode::Space);
+        if pressed {
+            println!("Space was pressed!");
+            if current_time > target_greater && current_time < target_lesser {
+                println!("Hit the note?");
+            }
+        }
+    }
+
+    // If we hit and there is a note that is within "some varialbe" of the "expected state" then ok!
+
+    // Time spawned - expected time to reach target. (Need to calculate this expectation.)
+    // if we are whithin a certain number of milliseconds of this, then destroy the note! And print a yay.
 }
 
 fn animate_sprite_system(
@@ -89,18 +123,45 @@ fn load_chart(commands: &mut Commands) {
     });
 }
 
-fn initialize_lane(windows: ResMut<Windows>, mut lane: ResMut<Lane>) {
+fn initialize_lane(
+    commands: &mut Commands,
+    windows: ResMut<Windows>,
+    mut lane: ResMut<Lane>,
+    noteskin_atlas: Res<NoteskinAtlas>,
+) {
     let wnd = windows.get_primary().unwrap();
     let size = Vec2::new(wnd.width() as f32, wnd.height() as f32);
     let spawn_point: Vec2 = Vec2::new(0.0, size.y / 2.0);
     lane.screen_position.x = spawn_point.x;
     lane.screen_position.y = spawn_point.y;
+
+    // Also place some entities for the appropriate receptor.
+    commands.spawn(SpriteSheetBundle {
+        texture_atlas: noteskin_atlas.texture_atlas_handle.clone_weak(),
+        transform: Transform {
+            translation: Vec3::new(0.0, lane.screen_position.y - 96.0, 0.0),
+            ..Default::default()
+        },
+        sprite: TextureAtlasSprite::new(36 as u32),
+        ..Default::default()
+    });
+}
+
+fn process_note_lifetime(commands: &mut Commands, query: Query<(Entity, &Note)>, time: Res<Time>) {
+    let current_time = time.time_since_startup().as_millis();
+
+    for (entity, note) in query.iter() {
+        if current_time > note.spawned_at + 5000 {
+            println!("You missed so long ago.");
+            commands.despawn(entity);
+        }
+    }
 }
 
 fn animate_the_notes(mut query: Query<(&Note, &mut Transform)>) {
-    for (note, mut transform) in query.iter_mut() {
+    for (_note, mut transform) in query.iter_mut() {
         // This note is just the note. We also want the sprite position transoform.
-        transform.translation.y += 1.0;
+        transform.translation.y += 0.1;
     }
 }
 
@@ -108,28 +169,33 @@ fn spawn_notes_when_time(
     commands: &mut Commands,
     mut chart: ResMut<Chart>,
     time: Res<Time>,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut timer: ResMut<Timer>,
+    noteskin_atlas: Res<NoteskinAtlas>,
 ) {
+    if !timer.finished() {
+        timer.tick(time.delta().as_secs_f32());
+        return;
+    }
+
     if chart.next_note >= chart.notes.len() as u32 {
         return;
     }
 
     let mut note = chart.notes[chart.next_note as usize];
 
-    while time.time_since_startup().as_millis() > note as u128 {
+    let current_time = time.time_since_startup().as_millis();
+    while current_time > note as u128 {
         // Do work with the chart, spawnt the notes and such. Note movement will be elsewhere.
-        let texture_handle = asset_server.load("packed.png");
-        let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 8, 8);
-        let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         commands
             .spawn(SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
+                texture_atlas: noteskin_atlas.texture_atlas_handle.clone_weak(),
                 transform: Transform::from_scale(Vec3::splat(1.0)),
                 ..Default::default()
             })
-            .with(Note { spawned_at: note });
+            .with(Note {
+                spawned_at: current_time,
+            });
 
         chart.next_note += 1;
 
@@ -139,24 +205,18 @@ fn spawn_notes_when_time(
 
         note = chart.notes[chart.next_note as usize];
     }
-
-    // DONE: I have a chart with 10 notes
-    // it is single lane.
-    // Roll the note up the screen from the bottom
-    // Spawn it when the note is supposed to be hit for now.
-
-    // Pick a position for the lane.
-    // Figure out the bitmagic
-    //
-
-    // Set up a timer for deciding when to play the notes.
-
-    // The timer needs to count up and
 }
 
-/// set up a simple 3D scene
-fn setup(commands: &mut Commands) {
-    commands
-        // camera
-        .spawn(Camera2dBundle::default());
+fn setup(
+    commands: &mut Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut noteskin_atlas: ResMut<NoteskinAtlas>,
+) {
+    let texture_handle = asset_server.load("packed.png");
+    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 8, 8);
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+    noteskin_atlas.texture_atlas_handle = texture_atlas_handle;
+
+    commands.spawn(Camera2dBundle::default());
 }
