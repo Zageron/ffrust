@@ -33,8 +33,8 @@ fn main() {
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_resource(WindowDescriptor {
             title: "FFR Rust Edition".to_string(),
-            width: 800,
-            height: 600,
+            width: 800.0,
+            height: 600.0,
             vsync: false,
             resizable: false,
             ..Default::default()
