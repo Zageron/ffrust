@@ -1,5 +1,9 @@
 # FFRUST
 
+tl;dr: [Build and Run](#build-and-run)
+
+----
+
 - [FFRUST](#ffrust)
   - [Setup](#setup)
     - [Windows Subsystem for Linux](#windows-subsystem-for-linux)
@@ -19,6 +23,8 @@
     - [Updating Cargo.toml](#updating-cargotoml)
   - [Reference](#reference)
     - [Rust wasm-bindgen](#rust-wasm-bindgen)
+
+----
 
 ## Setup
 
@@ -83,19 +89,36 @@ The previous install command probably didn't install the latest npm.
 ### Build and Run
 
 ```zsh
-cargo build
-wasm-pack build
-cd www
-npm install
-npm run start
+# wasm
+cargo make serve
+
+# native
+cargo make run
+```
+
+Alternatively:
+
+```zsh
+# leave off --release for debug build.
+cargo run --features native --release
+
 ```
 
 ### Updating Cargo.toml
 
 If you make any changes to Cargo.toml, run `cargo build`.
 
+----
+
 ## Reference
 
 ### Rust wasm-bindgen
 
 [https://rustwasm.github.io/wasm-bindgen/api/web_sys/index.html](https://rustwasm.github.io/wasm-bindgen/api/web_sys/index.html)
+
+[bevy_webgl2_app_template](https://github.com/mrk-its/bevy_webgl2_app_template)
+
+[bevy_webgl2](https://github.com/mrk-its/bevy_webgl2)
+
+
+----
