@@ -3,7 +3,20 @@ use std::{
     io::{BufReader, Read},
 };
 
-use bevy::prelude::*;
+use bevy::{
+    asset::{AssetLoader, LoadContext, LoadedAsset},
+    prelude::*,
+    reflect::TypeUuid,
+    utils::BoxedFuture,
+};
+
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize, TypeUuid)]
+#[uuid = "2cf0b9d8-6eb4-46f4-b833-24e1fd368eba"]
+pub struct CustomAsset {
+    pub value: i32,
+}
 
 #[derive(Default)]
 struct NoteskinAtlas {
@@ -48,14 +61,14 @@ fn main() {
     #[cfg(target_arch = "wasm32")]
     app.add_plugin(bevy_webgl2::WebGL2Plugin);
 
-    app.add_startup_system(setup)
-        .add_startup_system(load_chart)
-        .add_startup_system(initialize_lane)
-        .add_system(animate_sprite_system)
-        .add_system(spawn_notes_when_time)
-        .add_system(animate_the_notes)
-        .add_system(process_note_lifetime)
-        .add_system(keyboard_input_update)
+    app.add_startup_system(setup.system())
+        .add_startup_system(load_chart.system())
+        .add_startup_system(initialize_lane.system())
+        .add_system(animate_sprite_system.system())
+        .add_system(spawn_notes_when_time.system())
+        .add_system(animate_the_notes.system())
+        .add_system(process_note_lifetime.system())
+        .add_system(keyboard_input_update.system())
         .add_resource(Timer::from_seconds(2.0, false))
         .run();
 }
@@ -101,7 +114,9 @@ fn animate_sprite_system(
     }
 }
 
-fn load_file() -> std::io::Result<Vec<u32>> {
+fn load_file(asset_server: Res<AssetServer>) -> std::io::Result<Vec<u32>> {
+    //let texture_handle = asset_server.load("chart01.txt");
+
     let file = File::open("assets/chart01")?;
     let mut buf_reader = BufReader::new(file);
     let mut contents = String::new();
@@ -115,10 +130,10 @@ fn load_file() -> std::io::Result<Vec<u32>> {
     Ok(data)
 }
 
-fn load_chart(commands: &mut Commands) {
-    let value = load_file();
+fn load_chart(commands: &mut Commands, asset_server: Res<AssetServer>) {
+    let value = load_file(asset_server);
     commands.insert_resource(Chart {
-        notes: value.unwrap(),
+        notes: value.unwrap_or_default(),
         next_note: 0,
     });
 }

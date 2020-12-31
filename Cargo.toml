@@ -15,9 +15,10 @@ native = ["bevy/bevy_wgpu"]
 web = ["bevy_webgl2"]
 
 [dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy", rev = "d2e4327b14956b5028838fda538d45d2300e73f9", default-features = false }
-bevy_webgl2 = { git = "https://github.com/mrk-its/bevy_webgl2", rev = "e1576c97ea4de6bbb8198a1969c9bb489715e31c", optional = true }
-winit = { version = "0.24.0", features = ["web-sys"], default-features = false }
+bevy = { version = "0.4.0", default-features = false }
+bevy_webgl2 = { version = "0.4.0", optional = true }
+winit = { version = "0.24.0", features = ["web-sys"] }
+serde = { version = "1", features = ["derive"] }
 
 [profile.dev]
 opt-level = 's'
